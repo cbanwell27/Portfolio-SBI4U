@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">Laboratoire de physiologie de l’exercice</title>
+  <desc id="desc">Illustration d’un test d’effort avec une personne pédalant sur un vélo stationnaire, un moniteur cardiaque et une physiologiste.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#24375b"/>
+      <stop offset=".55" stop-color="#3d527c"/>
+      <stop offset="1" stop-color="#287467"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffd48d"/>
+      <stop offset="1" stop-color="#f19b75"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" x2="1">
+      <stop stop-color="#152a42"/>
+      <stop offset="1" stop-color="#1b4550"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#8ae7ca" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#8ae7ca" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="500" fill="url(#background)"/>
+  <circle cx="390" cy="145" r="235" fill="url(#glow)"/>
+  <path d="M0 408c243-47 382 19 586 9s382-62 568-23 296 29 446-13v119H0z" fill="#182741" opacity=".72"/>
+  <g transform="translate(103 88)">
+    <rect width="390" height="190" rx="18" fill="url(#screen)" stroke="#c2f0de" stroke-width="6"/>
+    <path d="M35 104h61l32-45 44 91 41-66 37 20h103" fill="none" stroke="#82e6c6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="172" cy="150" r="9" fill="#ffca81"/>
+    <path d="M158 190v28m58-28v28" stroke="#dcebe1" stroke-width="8" stroke-linecap="round"/>
+    <path d="M130 218h112" stroke="#dcebe1" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(475 115)">
+    <circle cx="190" cy="265" r="100" fill="none" stroke="#f2d394" stroke-width="9"/>
+    <circle cx="445" cy="265" r="100" fill="none" stroke="#f2d394" stroke-width="9"/>
+    <path d="m190 265 107-116 92 116H190l132-4 123 4-88-118-60 2-38 50" fill="none" stroke="#d4e5e0" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 148h82m-50 0-25-37h-48" fill="none" stroke="#d4e5e0" stroke-width="10" stroke-linecap="round"/>
+    <path d="M315 122h48m-6 0 13 31" fill="none" stroke="#ffcf83" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(620 35)">
+    <circle cx="284" cy="78" r="54" fill="#d89a77"/>
+    <path d="M229 72c-9-56 19-81 62-81 45 0 68 35 50 80-25-3-47-14-61-32-14 19-30 30-51 33z" fill="#36283f"/>
+    <path d="M204 151c43-34 112-34 155 0l44 118-76 21-55-72-54 76-85-23z" fill="url(#shirt)" stroke="#f4ddbf" stroke-width="5"/>
+    <path d="m236 258-90 83m179-63 63 77" fill="none" stroke="#d89a77" stroke-width="19" stroke-linecap="round"/>
+    <path d="M222 168 174 233m154-57 47 71" fill="none" stroke="#f1b689" stroke-width="22" stroke-linecap="round"/>
+    <path d="m250 300-36 107m95-91 46 90" fill="none" stroke="#202940" stroke-width="28" stroke-linecap="round"/>
+    <path d="M182 406h58m104 0h60" stroke="#f0d7b1" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(1170 65)">
+    <rect x="0" y="0" width="305" height="355" rx="24" fill="#e9eee5" stroke="#f7d99c" stroke-width="6"/>
+    <rect x="27" y="28" width="251" height="188" rx="13" fill="url(#screen)"/>
+    <path d="M46 122h40l28-38 32 71 32-53 28 20h55" fill="none" stroke="#83e4c4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m142 258 26-31 26 31-26 30z" fill="#cf4c76"/>
+    <path d="M168 287c-46-27-60-45-60-65 0-29 36-44 60-13 24-31 60-16 60 13 0 20-14 38-60 65z" fill="#cf4c76"/>
+    <path d="M62 325h181" stroke="#8e9498" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g fill="#f7dda4" opacity=".72">
+    <circle cx="570" cy="58" r="5"/><circle cx="810" cy="85" r="4"/>
+    <circle cx="1000" cy="84" r="5"/><circle cx="1095" cy="300" r="4"/>
+    <circle cx="516" cy="343" r="5"/><circle cx="1540" cy="79" r="4"/>
+  </g>
+</svg>

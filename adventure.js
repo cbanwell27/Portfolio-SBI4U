@@ -1,5 +1,10 @@
 (() => {
   const SAVE_KEY = "biology-quest-save-v1";
+  const SOUND_KEY = "biology-quest-sound-v1";
+  const musicNotes = [261.63, 329.63, 392, 329.63, 293.66, 392, 440, 392];
+  const rewardSound = new Audio("assets/rho-xp-chime.wav");
+  rewardSound.preload = "auto";
+  rewardSound.volume = 0.55;
   const freshSave = () => ({
     version: 1,
     xp: 0,
@@ -30,6 +35,13 @@
   };
   let storageAvailable = true;
   let save = freshSave();
+  let soundEnabled = false;
+  let soundStatus = "";
+  let audioContext = null;
+  let masterGain = null;
+  let musicTimer = null;
+  let musicIndex = 0;
+  let audioMuted = true;
 
   try {
     const stored = localStorage.getItem(SAVE_KEY);
@@ -37,6 +49,12 @@
   } catch (error) {
     storageAvailable = false;
     console.error("La sauvegarde locale de Quête du vivant est indisponible.", error);
+  }
+
+  try {
+    soundEnabled = localStorage.getItem(SOUND_KEY) === "enabled";
+  } catch (error) {
+    console.error("Le réglage sonore de Quête du vivant est indisponible.", error);
   }
 
   const page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
@@ -172,6 +190,167 @@
     hud.innerHTML = `<div class="hud-xp"><span>Niv. ${level} · ${save.xp} XP</span><progress max="100" value="${withinLevel}" aria-label="Progression vers le prochain niveau"></progress></div><div class="hud-badges" aria-label="Insignes">${badgeMarkup}</div>${storageAvailable ? "" : '<span role="status">Sauvegarde locale indisponible</span>'}`;
   }
 
+  function updateSoundButton() {
+    const button = document.querySelector("[data-sound-toggle]");
+    const label = button?.querySelector("[data-sound-label]");
+    const status = document.querySelector("[data-sound-status]");
+    if (button) {
+      button.setAttribute("aria-pressed", String(soundEnabled));
+      button.setAttribute(
+        "aria-label",
+        soundEnabled
+          ? "Désactiver la musique et les effets sonores"
+          : "Activer la musique et les effets sonores",
+      );
+      button.title = soundEnabled ? "Couper la musique et les effets" : "Activer la musique et les effets";
+    }
+    if (label) label.textContent = soundEnabled ? "Couper le son" : "Activer le son";
+    if (status) status.textContent = soundStatus;
+  }
+
+  function saveSoundPreference() {
+    try {
+      localStorage.setItem(SOUND_KEY, soundEnabled ? "enabled" : "disabled");
+    } catch (error) {
+      soundStatus = "Le réglage sonore ne sera pas conservé.";
+      console.error("Impossible d’enregistrer le réglage sonore.", error);
+    }
+  }
+
+  function getAudioContext() {
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) {
+      throw new Error("La lecture audio n’est pas prise en charge par ce navigateur.");
+    }
+    if (!audioContext) {
+      audioContext = new AudioContextConstructor();
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = 0;
+      masterGain.connect(audioContext.destination);
+    }
+    return audioContext;
+  }
+
+  function playTone(frequency, duration, volume, delay = 0) {
+    if (!soundEnabled || !audioContext || !masterGain || audioContext.state !== "running") return;
+    const start = audioContext.currentTime + delay;
+    const oscillator = audioContext.createOscillator();
+    const envelope = audioContext.createGain();
+    const attack = Math.min(0.08, duration * 0.25);
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, start);
+    envelope.gain.setValueAtTime(0.0001, start);
+    envelope.gain.exponentialRampToValueAtTime(volume, start + attack);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    oscillator.connect(envelope);
+    envelope.connect(masterGain);
+    oscillator.start(start);
+    oscillator.stop(start + duration + 0.04);
+  }
+
+  function playAmbientNote() {
+    if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+    const frequency = musicNotes[musicIndex % musicNotes.length];
+    playTone(frequency, 2.8, 0.055);
+    if (musicIndex % 3 === 0) playTone(frequency * 1.5, 3.2, 0.025, 0.08);
+    musicIndex += 1;
+  }
+
+  function startAmbientMusic() {
+    if (musicTimer) return;
+    playAmbientNote();
+    musicTimer = window.setInterval(playAmbientNote, 3200);
+  }
+
+  async function activateSound() {
+    const context = getAudioContext();
+    if (context.state !== "running") await context.resume();
+    if (!soundEnabled) return;
+    if (context.state !== "running") throw new Error("Le navigateur n’a pas activé la lecture audio.");
+    if (audioMuted && masterGain) {
+      masterGain.gain.setTargetAtTime(0.3, context.currentTime, 0.12);
+      audioMuted = false;
+    }
+    startAmbientMusic();
+  }
+
+  function deactivateSound() {
+    if (musicTimer) window.clearInterval(musicTimer);
+    musicTimer = null;
+    rewardSound.pause();
+    rewardSound.currentTime = 0;
+    if (!audioContext || !masterGain) return;
+    masterGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.035);
+    audioMuted = true;
+    const context = audioContext;
+    window.setTimeout(() => {
+      if (!soundEnabled && context.state === "running") {
+        context.suspend().catch((error) => {
+          console.error("Impossible de suspendre la lecture sonore.", error);
+        });
+      }
+    }, 180);
+  }
+
+  function handleSoundError(error) {
+    soundEnabled = false;
+    soundStatus = "Le son n’a pas pu démarrer dans ce navigateur.";
+    console.error("La lecture sonore de Quête du vivant a échoué.", error);
+    saveSoundPreference();
+    deactivateSound();
+    updateSoundButton();
+  }
+
+  function playCelebration() {
+    if (!soundEnabled) return;
+    rewardSound.currentTime = 0;
+    rewardSound.play()?.catch(handleSoundError);
+  }
+
+  function showXpReward() {
+    const targets = [
+      top?.querySelector(".hud-xp"),
+      document.querySelector(".rho-toggle"),
+    ].filter(Boolean);
+    targets.forEach((target) => {
+      target.classList.remove("is-rewarding");
+      void target.offsetWidth;
+      target.classList.add("is-rewarding");
+      window.setTimeout(() => target.classList.remove("is-rewarding"), 850);
+    });
+  }
+
+  function setupSoundControls() {
+    updateSoundButton();
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("[data-sound-toggle]")) {
+        soundEnabled = !soundEnabled;
+        soundStatus = "";
+        saveSoundPreference();
+        updateSoundButton();
+        if (soundEnabled) {
+          activateSound().catch(handleSoundError);
+        } else {
+          deactivateSound();
+        }
+        return;
+      }
+      const control = target.closest("button:not(:disabled), a[href], summary");
+      if (!soundEnabled || !control) return;
+      const rewardInteraction = control.matches('button[type="submit"], .game button');
+      activateSound()
+        .then(() => {
+          if (!rewardInteraction) {
+            playTone(587.33, 0.11, 0.12);
+            playTone(783.99, 0.13, 0.08, 0.07);
+          }
+        })
+        .catch(handleSoundError);
+    });
+  }
+
   function setGuide(text, mood = "curious", showDialogue = true) {
     guideText = text;
     guideMood = mood;
@@ -217,8 +396,10 @@
     }
     persist();
     updateHud();
+    showXpReward();
     refreshPortals();
     if (isProgress) renderProgressPage();
+    playCelebration();
     return true;
   }
 
@@ -226,7 +407,7 @@
     const companion = document.createElement("aside");
     companion.className = "rho-companion";
     companion.setAttribute("aria-label", "Rho, ton guide");
-    companion.innerHTML = `<div class="rho-dialogue" id="rho-dialogue" role="status" hidden><span class="rho-name">Rho</span><span data-rho-message></span></div><button class="rho-toggle" type="button" aria-expanded="false" aria-controls="rho-dialogue" aria-label="Parler à Rho"><img src="assets/rho-guide.png" alt=""/><span data-rho-action-label>Parler à Rho</span></button>`;
+    companion.innerHTML = `<div class="rho-dialogue" id="rho-dialogue" role="status" hidden><span class="rho-name">Rho</span><span data-rho-message></span></div><button class="sound-toggle" type="button" data-sound-toggle aria-pressed="false" aria-label="Activer la musique et les effets sonores"><span aria-hidden="true">♫</span><span data-sound-label>Activer le son</span></button><span class="sound-status" data-sound-status role="status" aria-live="polite"></span><button class="rho-toggle" type="button" aria-expanded="false" aria-controls="rho-dialogue" aria-label="Parler à Rho"><img src="assets/rho-guide.png" alt=""/><span data-rho-action-label>Parler à Rho</span></button>`;
     (top || document.body).append(companion);
     const button = companion.querySelector(".rho-toggle");
     const dialogue = companion.querySelector(".rho-dialogue");
@@ -344,13 +525,17 @@
           ? "#mission-finale"
           : isProgress
             ? "#bilan"
-          : page === "articles.html"
-            ? "#article"
-            : page === "carrieres.html"
-              ? "#carriere"
-              : page === "bibliographie.html"
-                ? "#sources"
-                : "#contenu";
+            : page === "articles.html"
+              ? "#menten"
+              : page === "carrieres.html"
+                ? "#emploi-biochimiste"
+                : page === "bibliographie.html"
+                  ? "#sources-unite1"
+                  : page === "presentation.html"
+                    ? "#cap-scientifique"
+                    : page === "lettre-ouverture.html"
+                      ? "#lettre"
+                      : "#contenu";
     start.textContent = isHome
       ? "Choisir un monde →"
       : isUnit2Locked
@@ -359,7 +544,17 @@
           ? "Rejoindre la mission →"
           : isProgress
             ? "Voir le parcours ↓"
-          : "Explorer les archives →";
+              : page === "articles.html"
+                ? "Lire les archives →"
+                : page === "carrieres.html"
+                  ? "Découvrir les métiers →"
+                  : page === "bibliographie.html"
+                    ? "Parcourir les sources →"
+                    : page === "presentation.html"
+                      ? "Découvrir le cap scientifique →"
+                      : page === "lettre-ouverture.html"
+                        ? "Lire la lettre de bord →"
+                        : "Explorer le contenu →";
     actions.append(start);
     if ((isUnit1 || isUnit2) && !isUnit2Locked) {
       const hint = document.createElement("button");
@@ -376,7 +571,7 @@
     guide.innerHTML = `<img src="assets/rho-guide.png" alt="Rho, rhinocéros explorateur de Quête du vivant"/><div class="guide-caption"><strong>Rho :</strong> ${isHome ? "Chaque monde cache une énigme. On part?" : isUnit1 ? "Regarde la structure avant de chercher sa fonction." : isUnit2 ? "Suis les électrons : ils racontent le trajet de l’énergie." : isProgress ? "Chaque défi accompli laisse une trace sur notre carte." : "Une bonne enquête commence par une question précise."}</div>`;
     hero.append(guide);
 
-    if (isUnit1 || isUnit2) {
+    if ((isUnit1 || isUnit2) && !isUnit2Locked) {
       const waypoints = document.createElement("nav");
       waypoints.className = "world-waypoints";
       waypoints.setAttribute("aria-label", "Lieux à explorer");
@@ -397,7 +592,7 @@
       hero.append(waypoints);
       const unitMenu = copy.querySelector(".unit-menu");
       if (unitMenu) {
-        unitMenu.classList.add("world-waypoints", "codex-menu");
+        unitMenu.classList.add("world-waypoints", "expedition-menu");
         unitMenu.setAttribute("role", "navigation");
         unitMenu.setAttribute("aria-label", "Lieux et archives du monde");
         hero.after(unitMenu);
@@ -823,6 +1018,7 @@
   createScene();
   createMission();
   createGuide();
+  setupSoundControls();
   decorateGuideNotes();
   clarifyButtonLabels();
   addWorldMap();

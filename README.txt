@@ -31,10 +31,11 @@ CONTENU
 - site.css : composants et interactions partagés du portfolio
 - unite1.js : simulation pédagogique des facteurs qui influencent l’activité enzymatique
 - adventure.css : mondes illustrés, interface de jeu et styles du compagnon
-- adventure.js : compagnon Rho, missions, XP, insignes, mondes visités et sauvegarde locale
+- adventure.js : compagnon Rho, missions, XP, insignes, audio facultatif et sauvegarde locale
 - assets/rho-guide.png : illustration du rhinocéros fournie par Charlotte
+- assets/rho-xp-chime.wav : son original de récompense joué quand Rho gagne des XP
 - assets/maud-menten.jpg : portrait de la Smithsonian Institution Archives, via Wikimedia Commons
 - assets/norman-huner.png : portrait fourni par Charlotte
 - assets/world-cell.svg et assets/world-energy.svg : décors des mondes 1 et 2
 
-Les pages restent séparées pour la compatibilité avec GitHub Pages. La progression du jeu est sauvegardée dans le stockage local du navigateur. La mission finale de l’unité 1 déverrouille le monde 2; les mondes 3 à 5 restent visibles, verrouillés et sans contenu ajouté.
+Les pages restent séparées pour la compatibilité avec GitHub Pages. La progression et la préférence sonore sont sauvegardées dans le stockage local du navigateur. La musique et les effets s’activent avec le bouton près de Rho; aucun son ne démarre automatiquement. La mission finale de l’unité 1 déverrouille le monde 2; les mondes 3 à 5 restent visibles, verrouillés et sans contenu ajouté.
