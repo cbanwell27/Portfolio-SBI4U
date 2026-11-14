@@ -809,12 +809,33 @@
     });
     document.querySelectorAll('[id^="quiz-feedback-"]').forEach((box, index) => {
       const quiz = document.getElementById(`quiz-${isUnit1 ? "1" : "2"}`);
-      quiz?.addEventListener("change", () => startActivity(`quiz-${page}-${index}`), { once: true });
+      const quizId = `quiz-${page}-${index}`;
+      quiz?.addEventListener("change", () => startActivity(quizId), { once: true });
+      let savedNotice = null;
+      const showSavedNotice = () => {
+        if (!savedNotice) {
+          savedNotice = document.createElement("p");
+          savedNotice.className = "quiz-save-notice";
+          savedNotice.setAttribute("role", "status");
+          savedNotice.textContent =
+            "Quiz déjà complété : tes points sont enregistrés. Tu peux le refaire, mais cette tentative ne donnera pas d’XP supplémentaire.";
+          box.after(savedNotice);
+        }
+      };
+      if (save.completed.includes(quizId)) showSavedNotice();
       const observer = new MutationObserver(() => {
+        if (save.completed.includes(quizId)) {
+          showSavedNotice();
+          setGuide(
+            "Ce quiz est déjà complété et tes points sont enregistrés. Tu peux le refaire, sans gagner d’XP supplémentaire.",
+            "happy",
+          );
+          return;
+        }
         const score = box.querySelector("p")?.textContent?.match(/(\d+)\s*\/\s*(\d+)/);
         if (!score) return;
         if (score[1] === score[2]) {
-          award(`quiz-${page}-${index}`, 25, isUnit1 ? "molecule" : "energy");
+          award(quizId, 25, isUnit1 ? "molecule" : "energy");
           setGuide("Quiz parfait! Tes connaissances sont prêtes pour le prochain défi.", "happy");
         } else setGuide("Une piste reste à examiner. Lis les explications, puis reviens au défi.", "thinking");
       });
