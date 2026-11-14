@@ -631,14 +631,28 @@
     const form = mission.querySelector("[data-mission-form]");
     const feedback = mission.querySelector(".mission-feedback");
     const missionId = isUnit1 ? "mission-u1" : "mission-u2";
+    let replayButton = null;
     form?.addEventListener("change", () => startActivity(missionId), { once: true });
     if (save.completed.includes(missionId)) {
       form?.querySelectorAll("input, select, button").forEach((control) => (control.disabled = true));
-      if (feedback) feedback.textContent = "Mission déjà accomplie — ta progression est sauvegardée.";
+      if (feedback) feedback.textContent = "Mission déjà accomplie — tu peux la rejouer sans gagner une deuxième fois les XP.";
+      replayButton = document.createElement("button");
+      replayButton.className = "mission-replay";
+      replayButton.type = "button";
+      replayButton.textContent = "Rejouer la mission sans nouvelle récompense";
+      form?.after(replayButton);
+      replayButton.addEventListener("click", () => {
+        form?.reset();
+        form?.querySelectorAll("input, select, button").forEach((control) => (control.disabled = false));
+        replayButton.hidden = true;
+        if (feedback) feedback.textContent = "Nouvelle tentative : les XP de cette mission ont déjà été obtenus.";
+        form?.querySelector("input, select")?.focus();
+      });
     }
     form?.addEventListener("submit", (event) => {
       event.preventDefault();
       const data = new FormData(form);
+      const alreadyCompleted = save.completed.includes(missionId);
       const correct = isUnit1
         ? data.get("solution") === "buffer" && data.get("reason") === "active-site"
         : ["glycolysis", "pyruvate", "krebs", "chain"].every(
@@ -651,15 +665,22 @@
         setGuide(isUnit1 ? "Indice : commence par corriger la condition qui modifie les charges du site actif." : "Indice : le glucose est d’abord fractionné; ensuite ses produits alimentent le cycle et la chaîne.", "thinking");
         return;
       }
-      award(missionId, isUnit1 ? 120 : 150, isUnit1 ? "cell" : "energy");
+      if (!alreadyCompleted) award(missionId, isUnit1 ? 120 : 150, isUnit1 ? "cell" : "energy");
       form.querySelectorAll("input, select, button").forEach((control) => (control.disabled = true));
-      if (feedback) feedback.textContent = isUnit1
-        ? "Mission réussie! Le milieu est rééquilibré et le portail du monde énergétique s’ouvre. +120 XP."
-        : "Mission réussie! La chaîne énergétique est relancée. +150 XP.";
+      if (alreadyCompleted && replayButton) replayButton.hidden = false;
+      if (feedback) {
+        feedback.textContent = alreadyCompleted
+          ? "Mission rejouée avec succès — aucune XP supplémentaire n’a été attribuée."
+          : isUnit1
+            ? "Mission réussie! Le milieu est rééquilibré et le portail du monde énergétique s’ouvre. +120 XP."
+            : "Mission réussie! La chaîne énergétique est relancée. +150 XP.";
+      }
       setGuide(
-        isUnit1
-          ? "Bien raisonné! Tu as relié le mécanisme à la bonne intervention. Le monde suivant s’ouvre."
-          : "Excellent! Le trajet de l’énergie est rétabli et ton succès est inscrit dans le carnet.",
+        alreadyCompleted
+          ? "Bravo pour cette nouvelle tentative! Ta récompense d’origine reste acquise, sans doublon."
+          : isUnit1
+            ? "Bien raisonné! Tu as relié le mécanisme à la bonne intervention. Le monde suivant s’ouvre."
+            : "Excellent! Le trajet de l’énergie est rétabli et ton succès est inscrit dans le carnet.",
         "happy",
       );
     });
@@ -972,7 +993,46 @@
           <ol class="rho-milestones">${milestoneMarkup}</ol>
         </section>
       </div>
+      <section class="progress-reset-block" aria-labelledby="restart-title">
+        <div><h3 id="restart-title">Repartir à zéro</h3><p>Recommencer effacera les XP, missions, insignes, mondes visités et portails déverrouillés dans ce navigateur. Le réglage du son sera conservé.</p></div>
+        <button class="progress-reset-trigger" type="button" data-reset-adventure>Recommencer l’aventure de Rho</button>
+        <div class="progress-reset-confirmation" data-reset-confirmation hidden role="group" aria-labelledby="restart-confirm-title">
+          <p id="restart-confirm-title">Cette action est irréversible. Veux-tu vraiment effacer toute la progression de Rho?</p>
+          <button class="progress-reset-confirm" type="button" data-confirm-reset>Oui, recommencer l’aventure</button>
+          <button class="progress-reset-cancel" type="button" data-cancel-reset>Annuler</button>
+        </div>
+      </section>
       <p class="progress-save-note" role="status">${storageAvailable ? "La progression est enregistrée dans ce navigateur." : "La sauvegarde locale est indisponible dans ce navigateur."}</p>`;
+
+    const resetTrigger = panel.querySelector("[data-reset-adventure]");
+    const resetConfirmation = panel.querySelector("[data-reset-confirmation]");
+    resetTrigger?.addEventListener("click", () => {
+      if (!resetConfirmation) return;
+      resetConfirmation.hidden = false;
+      resetTrigger.hidden = true;
+      resetConfirmation.querySelector("[data-confirm-reset]")?.focus();
+    });
+    panel.querySelector("[data-cancel-reset]")?.addEventListener("click", () => {
+      if (resetConfirmation) resetConfirmation.hidden = true;
+      if (resetTrigger) {
+        resetTrigger.hidden = false;
+        resetTrigger.focus();
+      }
+    });
+    panel.querySelector("[data-confirm-reset]")?.addEventListener("click", () => {
+      const previousSave = save;
+      save = freshSave();
+      if (!persist()) {
+        save = previousSave;
+        updateHud();
+        renderProgressPage();
+        return;
+      }
+      updateHud();
+      refreshPortals();
+      renderProgressPage();
+      setGuide("Une nouvelle expédition commence! Choisis un monde et nous repartirons ensemble.", "curious");
+    });
 
     setGuide(message.text, message.mood, false);
   }
