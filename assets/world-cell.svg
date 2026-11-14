@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620">
+  <defs>
+    <linearGradient id="space" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#181a4a"/>
+      <stop offset=".52" stop-color="#482660"/>
+      <stop offset="1" stop-color="#9a4272"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#ffce91" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#fa9a9d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="membrane" x1="0" x2="1">
+      <stop stop-color="#45dec2"/>
+      <stop offset="1" stop-color="#a1f2c2"/>
+    </linearGradient>
+    <linearGradient id="organelle" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#eeb27c"/>
+      <stop offset="1" stop-color="#ca5579"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="620" fill="url(#space)"/>
+  <circle cx="970" cy="210" r="290" fill="url(#glow)"/>
+  <path d="M-40 450C190 340 350 505 600 405S1020 324 1480 445v220H-40z" fill="#26235f" opacity=".8"/>
+  <path d="M-30 480C205 385 370 540 620 446s435-92 870 18" fill="none" stroke="url(#membrane)" stroke-width="24" opacity=".58"/>
+  <path d="M-30 515C205 420 370 575 620 481s435-92 870 18" fill="none" stroke="#b6ffe0" stroke-width="5" opacity=".55"/>
+  <g opacity=".84">
+    <circle cx="1150" cy="104" r="52" fill="#ffb571" opacity=".25"/>
+    <circle cx="1150" cy="104" r="29" fill="none" stroke="#ffd99e" stroke-width="3"/>
+    <circle cx="1150" cy="104" r="10" fill="#ffd99e"/>
+    <circle cx="275" cy="150" r="74" fill="#4dd8c2" opacity=".13"/>
+    <circle cx="275" cy="150" r="49" fill="none" stroke="#83f4db" stroke-width="4" opacity=".75"/>
+    <circle cx="275" cy="150" r="18" fill="#83f4db" opacity=".8"/>
+  </g>
+  <g transform="translate(890 360)">
+    <ellipse rx="128" ry="61" fill="url(#organelle)" stroke="#ffcfaa" stroke-width="5"/>
+    <path d="M-96 0c32-42 51 42 83 0s49-42 79 0 47 42 78 0" fill="none" stroke="#ffe0bd" stroke-width="8" opacity=".82"/>
+  </g>
+  <g transform="translate(1190 395)" fill="#f3bf85" opacity=".8">
+    <circle r="43" fill="#bf5b83"/>
+    <circle r="8" cx="-15" cy="-9"/>
+    <circle r="10" cx="16" cy="7"/>
+    <circle r="5" cx="-3" cy="20"/>
+  </g>
+  <g fill="#e1fff2" opacity=".7">
+    <circle cx="664" cy="116" r="4"/><circle cx="727" cy="225" r="3"/>
+    <circle cx="545" cy="274" r="5"/><circle cx="1020" cy="275" r="4"/>
+    <circle cx="1326" cy="232" r="5"/><circle cx="790" cy="72" r="3"/>
+    <circle cx="365" cy="320" r="4"/><circle cx="580" cy="90" r="3"/>
+  </g>
+</svg>

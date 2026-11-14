@@ -1,4 +1,4 @@
-PORTFOLIO SBI4U - VERSION INTERMEDIAIRE
+QUÊTE DU VIVANT — PORTFOLIO SBI4U
 
 OUVRIR DANS VISUAL STUDIO CODE
 1. Décompressez le dossier Portfolio_SBI4U.
@@ -23,12 +23,17 @@ CONTENU
 - lettre-ouverture.html : lettre d'ouverture
 - unite1.html et unite2.html : unités 1 et 2
 - unite1.html : leçons du Module 1 (sections 1.1 à 2.2) et simulation enzymatique
-- unite2.html : leçons du Module 2 (sections 3.1 à 4.2), avec précisions scientifiques signalées
-- articles.html : articles
+- unite2.html : leçons du Module 2 (sections 3.1 à 4.2), respiration et photosynthèse
+- articles.html : articles scientifiques sur Maud L. Menten et Norman P. A. Hüner, schémas interactifs et défis
 - carrieres.html : carrières
 - bibliographie.html : bibliographie
-- site.css : navigation mobile, cartes d’avancement et composants partagés
+- site.css : composants et interactions partagés du portfolio
 - unite1.js : simulation pédagogique des facteurs qui influencent l’activité enzymatique
+- adventure.css : mondes illustrés, interface de jeu et styles du compagnon
+- adventure.js : compagnon Rho, missions, XP, insignes, déverrouillage et sauvegarde locale
+- assets/rho-guide.png : illustration du rhinocéros fournie par Charlotte
+- assets/maud-menten.jpg : portrait de la Smithsonian Institution Archives, via Wikimedia Commons
+- assets/norman-huner.png : portrait fourni par Charlotte
+- assets/world-cell.svg et assets/world-energy.svg : décors des mondes 1 et 2
 
-Les pages restent séparées pour la compatibilité avec GitHub Pages. Les styles des leçons et des laboratoires sont dans site.css; la simulation de l’unité 1 est dans unite1.js. Les autres interactions existantes sont encore intégrées aux pages et pourront être modularisées progressivement.
-Les documents de génétique moléculaire du dossier de cours sont réservés aux unités futures; leur contenu n’est pas développé ici. Cette version intermédiaire ne comprend pas les unités 3 à 5 ni la lettre de clôture.
+Les pages restent séparées pour la compatibilité avec GitHub Pages. La progression du jeu est sauvegardée dans le stockage local du navigateur. La mission finale de l’unité 1 déverrouille le monde 2; les mondes 3 à 5 restent visibles, verrouillés et sans contenu ajouté.
