@@ -1,0 +1,215 @@
+.navbtn[aria-disabled="true"] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.navbtn[aria-disabled="true"]:hover {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.module-upcoming {
+  background: linear-gradient(145deg, var(--card), #fff8e6);
+  cursor: default;
+}
+
+.module-upcoming:hover {
+  transform: none;
+  border-color: #ecd9c5;
+  background: linear-gradient(145deg, var(--card), #fff8e6);
+  box-shadow: none;
+}
+
+.module-upcoming h3 {
+  margin: 0.45rem 0;
+}
+
+.module-upcoming p {
+  margin: 0 0 1rem;
+}
+
+.module-status {
+  display: inline-block;
+  margin-top: auto;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff1c9;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 760px) {
+  nav {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .brand {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 0 0.35rem 0 0;
+    white-space: nowrap;
+  }
+
+  .navbtn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+.lesson-intro {
+  margin-bottom: 1.25rem;
+  color: var(--muted);
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+}
+
+.lesson-card {
+  padding: 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--card);
+}
+
+.lesson-card h3 {
+  margin: 0 0 0.7rem;
+  color: var(--accent);
+}
+
+.lesson-card h4 {
+  margin-bottom: 0.35rem;
+}
+
+.lesson-card p:last-child,
+.lesson-card ul:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-card ul {
+  padding-left: 1.25rem;
+}
+
+.lesson-keypoint {
+  margin-top: 0.8rem;
+  padding: 0.75rem;
+  border-left: 3px solid var(--accent2);
+  background: color-mix(in srgb, var(--accent2) 8%, white);
+}
+
+.process-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+}
+
+.process-flow span:not(.process-arrow) {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--paper);
+}
+
+.process-arrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.stage-details {
+  margin: 0.65rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--paper);
+}
+
+.stage-details summary {
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.stage-details p {
+  margin-bottom: 0;
+}
+
+.lesson-keypoint sup,
+.lesson-keypoint sub {
+  line-height: 0;
+}
+
+.enzyme-lab {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.enzyme-lab fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+}
+
+.enzyme-lab legend {
+  padding: 0 0.35rem;
+  font-weight: 700;
+}
+
+.enzyme-lab label {
+  display: block;
+  margin: 0.85rem 0 0.3rem;
+  font-weight: 650;
+}
+
+.enzyme-lab input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.lab-output {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: var(--paper);
+}
+
+.lab-output progress {
+  width: 100%;
+  height: 1rem;
+  accent-color: var(--accent);
+}
+
+.lab-caveat {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

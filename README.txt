@@ -22,9 +22,13 @@ CONTENU
 - presentation.html : présentation
 - lettre-ouverture.html : lettre d'ouverture
 - unite1.html et unite2.html : unités 1 et 2
+- unite1.html : leçons du Module 1 (sections 1.1 à 2.2) et simulation enzymatique
+- unite2.html : leçons du Module 2 (sections 3.1 à 4.2), avec précisions scientifiques signalées
 - articles.html : articles
 - carrieres.html : carrières
 - bibliographie.html : bibliographie
+- site.css : navigation mobile, cartes d’avancement et composants partagés
+- unite1.js : simulation pédagogique des facteurs qui influencent l’activité enzymatique
 
-Les pages sont autonomes et contiennent leur mise en forme et leurs interactions intégrées.
-Cette version intermédiaire ne comprend pas les unités 3 à 5 ni la lettre de clôture.
+Les pages restent séparées pour la compatibilité avec GitHub Pages. Les styles des leçons et des laboratoires sont dans site.css; la simulation de l’unité 1 est dans unite1.js. Les autres interactions existantes sont encore intégrées aux pages et pourront être modularisées progressivement.
+Les documents de génétique moléculaire du dossier de cours sont réservés aux unités futures; leur contenu n’est pas développé ici. Cette version intermédiaire ne comprend pas les unités 3 à 5 ni la lettre de clôture.
