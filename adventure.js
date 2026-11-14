@@ -4,27 +4,36 @@
     version: 1,
     xp: 0,
     completed: [],
+    started: [],
+    visited: [],
     badges: [],
     unlocked: ["unite1.html"],
   });
+  const normalizeSave = (value) => {
+    if (
+      value?.version !== 1 ||
+      !Number.isFinite(value.xp) ||
+      !Array.isArray(value.completed) ||
+      !Array.isArray(value.badges) ||
+      !Array.isArray(value.unlocked) ||
+      (value.started !== undefined && !Array.isArray(value.started)) ||
+      (value.visited !== undefined && !Array.isArray(value.visited))
+    ) {
+      throw new Error("Format de sauvegarde de la Quête du vivant non reconnu.");
+    }
+    return {
+      ...freshSave(),
+      ...value,
+      started: value.started || [],
+      visited: value.visited || [],
+    };
+  };
   let storageAvailable = true;
   let save = freshSave();
 
   try {
     const stored = localStorage.getItem(SAVE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (
-        parsed?.version !== 1 ||
-        !Number.isFinite(parsed.xp) ||
-        !Array.isArray(parsed.completed) ||
-        !Array.isArray(parsed.badges) ||
-        !Array.isArray(parsed.unlocked)
-      ) {
-        throw new Error("Format de sauvegarde de la Quête du vivant non reconnu.");
-      }
-      save = parsed;
-    }
+    if (stored) save = normalizeSave(JSON.parse(stored));
   } catch (error) {
     storageAvailable = false;
     console.error("La sauvegarde locale de Quête du vivant est indisponible.", error);
@@ -35,12 +44,13 @@
   const isUnit1 = page === "unite1.html";
   const isUnit2 = page === "unite2.html";
   const isArticles = page === "articles.html";
+  const isProgress = page === "parcours-rho.html";
   const isUnit2Locked = isUnit2 && !save.unlocked.includes("unite2.html");
   const body = document.body;
   const main = document.querySelector("main#contenu");
   const top = document.querySelector("header.top");
   if (isUnit2Locked && main) {
-    main.innerHTML = `<div class="breadcrumbs"><a href="index.html">Accueil</a> › Portail verrouillé</div><section class="hero unit-head"><div class="unit-kicker">Portail verrouillé</div><h1>Le laboratoire de l’énergie</h1><p>Cette région se dévoilera après la mission finale du monde de biochimie cellulaire.</p><p><a class="btn" href="index.html#unites">Retourner à la carte →</a></p></section>`;
+    main.innerHTML = `<div class="breadcrumbs"><a href="index.html">Camp de départ</a> › Portail verrouillé</div><section class="hero unit-head"><div class="unit-kicker">Portail verrouillé</div><h1>Le laboratoire de l’énergie</h1><p>Cette région se dévoilera après la mission finale du monde de biochimie cellulaire.</p><p><a class="btn" href="index.html#unites">Retour à la carte des mondes →</a></p></section>`;
   }
   const hero = main?.querySelector(".hero");
   const guideLines = {
@@ -48,6 +58,7 @@
     unit1: "Ici, une forme moléculaire peut tout changer. Observe les pièces avant d’agir.",
     unit2: "Suivons l’énergie : chaque transfert a un coût, une direction et une conséquence.",
     archive: "Les archives gardent les découvertes, les carrières et les traces de l’expédition.",
+    progress: "Je garde la trace des mondes visités, des défis relevés et des insignes gagnés.",
   };
   let guideText = isHome
     ? guideLines.home
@@ -57,12 +68,22 @@
         ? guideLines.unit2
         : isArticles
           ? "Deux chercheurs, deux mondes : suivons les indices qui relient les enzymes et la photosynthèse à la vie cellulaire."
-          : guideLines.archive;
+          : isProgress
+            ? guideLines.progress
+            : guideLines.archive;
   let guideMood = "curious";
 
   body.classList.add("adventure-site");
   body.classList.add(
-    isHome ? "world-home" : isUnit1 ? "world-cell" : isUnit2 ? "world-energy" : "world-archive",
+    isHome
+      ? "world-home"
+      : isUnit1
+        ? "world-cell"
+        : isUnit2
+          ? "world-energy"
+          : isProgress
+            ? "world-profile"
+            : "world-archive",
   );
 
   function persist() {
@@ -76,6 +97,12 @@
       updateHud();
       return false;
     }
+  }
+
+  function recordWorldVisit() {
+    if ((!isUnit1 && !isUnit2) || isUnit2Locked || save.visited.includes(page)) return;
+    save.visited.push(page);
+    persist();
   }
 
   function knownBadge(id) {
@@ -160,8 +187,20 @@
         companion?.classList.add("is-speaking");
       }
     }
-    if (button && showDialogue) button.setAttribute("aria-expanded", "true");
+    if (button && showDialogue) {
+      button.setAttribute("aria-expanded", "true");
+      button.setAttribute("aria-label", "Fermer le dialogue de Rho");
+      const label = button.querySelector("[data-rho-action-label]");
+      if (label) label.textContent = "Fermer le dialogue";
+    }
     if (avatar) avatar.dataset.mood = guideMood;
+  }
+
+  function startActivity(id) {
+    if (save.completed.includes(id) || save.started.includes(id)) return;
+    save.started.push(id);
+    persist();
+    if (isProgress) renderProgressPage();
   }
 
   function award(id, points, badgeId) {
@@ -170,6 +209,7 @@
       return false;
     }
     save.completed.push(id);
+    save.started = save.started.filter((activity) => activity !== id);
     save.xp += points;
     if (badgeId && !save.badges.includes(badgeId)) save.badges.push(badgeId);
     if (id === "mission-u1" && !save.unlocked.includes("unite2.html")) {
@@ -178,6 +218,7 @@
     persist();
     updateHud();
     refreshPortals();
+    if (isProgress) renderProgressPage();
     return true;
   }
 
@@ -185,7 +226,7 @@
     const companion = document.createElement("aside");
     companion.className = "rho-companion";
     companion.setAttribute("aria-label", "Rho, ton guide");
-    companion.innerHTML = `<div class="rho-dialogue" id="rho-dialogue" role="status" hidden><span class="rho-name">Rho</span><span data-rho-message></span></div><button class="rho-toggle" type="button" aria-expanded="false" aria-controls="rho-dialogue" aria-label="Parler à Rho"><img src="assets/rho-guide.png" alt="Rho, le rhinocéros éclaireur"/></button>`;
+    companion.innerHTML = `<div class="rho-dialogue" id="rho-dialogue" role="status" hidden><span class="rho-name">Rho</span><span data-rho-message></span></div><button class="rho-toggle" type="button" aria-expanded="false" aria-controls="rho-dialogue" aria-label="Parler à Rho"><img src="assets/rho-guide.png" alt=""/><span data-rho-action-label>Parler à Rho</span></button>`;
     (top || document.body).append(companion);
     const button = companion.querySelector(".rho-toggle");
     const dialogue = companion.querySelector(".rho-dialogue");
@@ -194,6 +235,9 @@
       if (dialogue) dialogue.hidden = !dialogue.hidden;
       companion.classList.toggle("is-speaking", opening);
       button?.setAttribute("aria-expanded", String(opening));
+      button?.setAttribute("aria-label", opening ? "Fermer le dialogue de Rho" : "Parler à Rho");
+      const label = button?.querySelector("[data-rho-action-label]");
+      if (label) label.textContent = opening ? "Fermer le dialogue" : "Parler à Rho";
       if (opening) setGuide(guideText, guideMood);
     });
     setGuide(guideText, guideMood, false);
@@ -226,6 +270,15 @@
     });
   }
 
+  function clarifyButtonLabels() {
+    document.querySelectorAll(".concept-node").forEach((button) => {
+      const concept = button.dataset.title || button.textContent.trim();
+      const label = `Afficher les liens du concept ${concept}`;
+      button.setAttribute("aria-label", label);
+      button.title = label;
+    });
+  }
+
   function createWaypoint(label, target) {
     const link = document.createElement("a");
     link.className = "waypoint";
@@ -251,6 +304,8 @@
           ? "Monde 01 · La cellule vivante"
           : isUnit2
             ? "Monde 02 · Le laboratoire de l’énergie"
+            : isProgress
+              ? "Profil du compagnon · Quête du vivant"
             : "Carnet d’exploration · SBI4U";
     }
 
@@ -287,6 +342,8 @@
         ? "index.html#unites"
         : isUnit1 || isUnit2
           ? "#mission-finale"
+          : isProgress
+            ? "#bilan"
           : page === "articles.html"
             ? "#article"
             : page === "carrieres.html"
@@ -297,9 +354,11 @@
     start.textContent = isHome
       ? "Choisir un monde →"
       : isUnit2Locked
-        ? "Retourner à la carte →"
+        ? "Retour à la carte des mondes →"
         : isUnit1 || isUnit2
           ? "Rejoindre la mission →"
+          : isProgress
+            ? "Voir le parcours ↓"
           : "Explorer les archives →";
     actions.append(start);
     if ((isUnit1 || isUnit2) && !isUnit2Locked) {
@@ -307,14 +366,14 @@
       hint.className = "quest-action secondary";
       hint.type = "button";
       hint.dataset.rhoHint = "true";
-      hint.textContent = "Indice de Rho";
+      hint.textContent = "Afficher un indice de Rho";
       actions.append(hint);
     }
     if (!isHome) copy.append(actions);
 
     const guide = document.createElement("div");
     guide.className = "scene-guide";
-    guide.innerHTML = `<img src="assets/rho-guide.png" alt="Rho, rhinocéros explorateur de Quête du vivant"/><div class="guide-caption"><strong>Rho :</strong> ${isHome ? "Chaque monde cache une énigme. On part?" : isUnit1 ? "Regarde la structure avant de chercher sa fonction." : isUnit2 ? "Suis les électrons : ils racontent le trajet de l’énergie." : "Une bonne enquête commence par une question précise."}</div>`;
+    guide.innerHTML = `<img src="assets/rho-guide.png" alt="Rho, rhinocéros explorateur de Quête du vivant"/><div class="guide-caption"><strong>Rho :</strong> ${isHome ? "Chaque monde cache une énigme. On part?" : isUnit1 ? "Regarde la structure avant de chercher sa fonction." : isUnit2 ? "Suis les électrons : ils racontent le trajet de l’énergie." : isProgress ? "Chaque défi accompli laisse une trace sur notre carte." : "Une bonne enquête commence par une question précise."}</div>`;
     hero.append(guide);
 
     if (isUnit1 || isUnit2) {
@@ -370,10 +429,14 @@
     const firstSection = main.querySelector(".content-section");
     if (firstSection) firstSection.before(mission);
     else main.append(mission);
+    if (location.hash === "#mission-finale") {
+      requestAnimationFrame(() => mission.scrollIntoView({ block: "start" }));
+    }
 
     const form = mission.querySelector("[data-mission-form]");
     const feedback = mission.querySelector(".mission-feedback");
     const missionId = isUnit1 ? "mission-u1" : "mission-u2";
+    form?.addEventListener("change", () => startActivity(missionId), { once: true });
     if (save.completed.includes(missionId)) {
       form?.querySelectorAll("input, select, button").forEach((control) => (control.disabled = true));
       if (feedback) feedback.textContent = "Mission déjà accomplie — ta progression est sauvegardée.";
@@ -468,6 +531,7 @@
         ? "Indice de Rho : cherche la concentration de substrat qui correspond à la moitié de la vitesse maximale."
         : "Indice de Rho : compare la lumière captée à la capacité du métabolisme à utiliser les électrons.";
 
+      form.addEventListener("change", () => startActivity(challengeId), { once: true });
       if (save.completed.includes(challengeId)) {
         form.querySelectorAll("input, button").forEach((control) => (control.disabled = true));
         if (feedback) feedback.textContent = "Défi déjà réussi — tes points et ton insigne sont sauvegardés.";
@@ -503,6 +567,9 @@
     document.querySelectorAll(".game").forEach((game, index) => {
       const counter = game.querySelector(".game-counter");
       const status = game.querySelector("[data-game-status]");
+      game.addEventListener("click", (event) => {
+        if (event.target.closest("button")) startActivity(`matching-${page}-${index}`);
+      });
       if (status) {
         const statusObserver = new MutationObserver(() => {
           const message = status.textContent || "";
@@ -525,6 +592,8 @@
       observer.observe(counter, { childList: true, characterData: true, subtree: true });
     });
     document.querySelectorAll('[id^="quiz-feedback-"]').forEach((box, index) => {
+      const quiz = document.getElementById(`quiz-${isUnit1 ? "1" : "2"}`);
+      quiz?.addEventListener("change", () => startActivity(`quiz-${page}-${index}`), { once: true });
       const observer = new MutationObserver(() => {
         const score = box.querySelector("p")?.textContent?.match(/(\d+)\s*\/\s*(\d+)/);
         if (!score) return;
@@ -535,6 +604,182 @@
       });
       observer.observe(box, { childList: true, characterData: true, subtree: true });
     });
+  }
+
+  const progressActivities = [
+    { id: "mission-u1", title: "Sauver la cellule", unit: "unite1.html", section: "mission-finale", category: "Mission finale", xp: 120 },
+    { id: "matching-unite1.html-0", title: "Relier les notions de biochimie", unit: "unite1.html", section: "jeux", category: "Associations", xp: 20 },
+    { id: "quiz-unite1.html-0", title: "Épreuve de biochimie cellulaire", unit: "unite1.html", section: "quiz", category: "Quiz", xp: 25 },
+    { id: "article-menten", title: "Enquête — Maud L. Menten", unit: "articles.html", section: "menten", category: "Archive scientifique", xp: 35, alwaysAvailable: true },
+    { id: "mission-u2", title: "Restaurer l’énergie", unit: "unite2.html", section: "mission-finale", category: "Mission finale", xp: 150 },
+    { id: "matching-unite2.html-0", title: "Relier les notions énergétiques", unit: "unite2.html", section: "jeux", category: "Associations", xp: 20 },
+    { id: "quiz-unite2.html-0", title: "Épreuve des processus métaboliques", unit: "unite2.html", section: "quiz", category: "Quiz", xp: 25 },
+    { id: "article-huner", title: "Enquête — Norman P. A. Hüner", unit: "articles.html", section: "huner", category: "Archive scientifique", xp: 35, alwaysAvailable: true },
+  ];
+
+  const profileBadges = [
+    { id: "molecule", icon: "◈", title: "Éclaireuse moléculaire", detail: "Défi de concepts du monde cellulaire" },
+    { id: "cell", icon: "✦", title: "Gardienne de la cellule", detail: "Mission finale du monde cellulaire" },
+    { id: "menten", icon: "◉", title: "Éclaireuse enzymatique", detail: "Enquête scientifique sur Maud L. Menten" },
+    { id: "energy", icon: "⚡", title: "Maîtresse de l’énergie", detail: "Défi de concepts ou mission du monde énergétique" },
+    { id: "huner", icon: "↗", title: "Gardienne de la photostase", detail: "Enquête scientifique sur Norman P. A. Hüner" },
+  ];
+
+  function isActivityAvailable(activity) {
+    return activity.alwaysAvailable || save.unlocked.includes(activity.unit);
+  }
+
+  function getActivityStatus(activity) {
+    if (save.completed.includes(activity.id)) return "completed";
+    if (!isActivityAvailable(activity)) return "locked";
+    return save.started.includes(activity.id) ? "in-progress" : "available";
+  }
+
+  function getProgressMessage() {
+    const available = progressActivities.filter(isActivityAvailable);
+    if (available.every((activity) => save.completed.includes(activity.id))) {
+      return {
+        text: "Tous les défis actuellement accessibles sont accomplis. Gardons le cap : de nouveaux mondes attendent encore sur la carte.",
+        mood: "happy",
+      };
+    }
+    if (save.completed.includes("mission-u2")) {
+      return {
+        text: "Le laboratoire de l’énergie fonctionne de nouveau. Tes découvertes ont relié les réactions cellulaires à la photosynthèse.",
+        mood: "happy",
+      };
+    }
+    if (save.completed.includes("mission-u1")) {
+      return {
+        text: "Le portail énergétique est ouvert! Les défis de biochimie restent dans notre sillage, et un nouveau monde est prêt à être exploré.",
+        mood: "happy",
+      };
+    }
+    if (save.started.length) {
+      return {
+        text: "Une enquête est en cours. Reprenons les indices là où tu les as laissés.",
+        mood: "thinking",
+      };
+    }
+    if (save.visited.includes("unite1.html")) {
+      return {
+        text: "Le monde cellulaire a été visité. Les missions et les défis accomplis ouvriront la suite de l’expédition.",
+        mood: "curious",
+      };
+    }
+    return {
+      text: "Bienvenue dans mon carnet! Choisis un monde, relève ses défis et je garderai en mémoire les étapes franchies.",
+      mood: "curious",
+    };
+  }
+
+  function renderProgressPage() {
+    const panel = document.querySelector("#rho-progress-content");
+    if (!panel) return;
+
+    const message = getProgressMessage();
+    const available = progressActivities.filter(isActivityAvailable);
+    const completedAvailable = available.filter((activity) => save.completed.includes(activity.id)).length;
+    const level = Math.floor(save.xp / 100) + 1;
+    const levelProgress = save.xp % 100;
+    const exploredWorlds = ["unite1.html", "unite2.html"].filter((world) => save.visited.includes(world)).length;
+    const unlockedWorld2 = save.unlocked.includes("unite2.html");
+
+    const worlds = [
+      { number: "01", name: "Biochimie cellulaire", page: "unite1.html", mission: "mission-u1" },
+      { number: "02", name: "Processus métaboliques", page: "unite2.html", mission: "mission-u2" },
+      { number: "03", name: "Génétique moléculaire", locked: true },
+      { number: "04", name: "Homéostasie", locked: true },
+      { number: "05", name: "Populations et écosystèmes", locked: true },
+    ];
+
+    const worldMarkup = worlds.map((world) => {
+      const locked = world.locked || (world.page === "unite2.html" && !unlockedWorld2);
+      const explored = world.page && save.visited.includes(world.page);
+      const missionComplete = world.mission && save.completed.includes(world.mission);
+      const status = locked
+        ? "Verrouillé"
+        : missionComplete
+          ? "Mission accomplie"
+          : explored
+            ? "Exploré"
+            : "Ouvert";
+      const className = locked ? "locked" : missionComplete ? "complete" : explored ? "explored" : "open";
+      const card = `<span class="journey-world-number">Monde ${world.number}</span><strong>${world.name}</strong><span class="journey-world-status" data-status="${className}">${status}</span>`;
+      return locked
+        ? `<article class="journey-world" data-state="${className}">${card}${world.number === "02" ? '<small>Déverrouillé après « Sauver la cellule »</small>' : ""}</article>`
+        : `<a class="journey-world" data-state="${className}" href="${world.page}">${card}<span class="journey-world-link">${explored ? "Revisiter le monde →" : "Explorer le monde →"}</span></a>`;
+    }).join("");
+
+    const activityMarkup = progressActivities.map((activity) => {
+      const status = getActivityStatus(activity);
+      const label = status === "completed"
+        ? "Accompli"
+        : status === "in-progress"
+          ? "En cours"
+          : status === "locked"
+            ? "Verrouillé"
+            : "À découvrir";
+      const target = `${activity.unit}#${activity.section}`;
+      const actionLabel = status === "completed"
+        ? "Revoir le défi →"
+        : status === "in-progress"
+          ? "Reprendre le défi →"
+          : "Commencer le défi →";
+      const action = status === "locked"
+        ? '<span class="activity-locked">Accès après le déverrouillage du monde</span>'
+        : `<a class="activity-action" href="${target}">${actionLabel}</a>`;
+      return `<article class="progress-activity" data-status="${status}"><div class="activity-heading"><span class="activity-category">${activity.category}</span><span class="activity-status" data-status="${status}">${label}</span></div><h4>${activity.title}</h4><p>Récompense : +${activity.xp} XP</p>${action}</article>`;
+    }).join("");
+
+    const badgeMarkup = profileBadges.map((badge) => {
+      const earned = save.badges.includes(badge.id);
+      return `<article class="rho-badge" data-earned="${earned}"><span class="rho-badge-icon" aria-hidden="true">${badge.icon}</span><div><h4>${badge.title}</h4><p>${badge.detail}</p><span class="badge-status">${earned ? "Insigne obtenu" : "À gagner"}</span></div></article>`;
+    }).join("");
+
+    const milestones = [
+      { condition: save.visited.includes("unite1.html"), text: "Première exploration du monde cellulaire" },
+      { condition: save.badges.includes("menten"), text: "Insigne enzymatique de Maud L. Menten obtenu" },
+      { condition: save.completed.includes("mission-u1"), text: "Portail du laboratoire de l’énergie déverrouillé" },
+      { condition: save.badges.includes("huner"), text: "Insigne de photostase de Norman P. A. Hüner obtenu" },
+      { condition: save.completed.includes("mission-u2"), text: "Production énergétique restaurée" },
+    ];
+    const milestoneMarkup = milestones.map((milestone) => (
+      `<li data-reached="${milestone.condition}"><span aria-hidden="true">${milestone.condition ? "✓" : "○"}</span><span>${milestone.text}</span><strong>${milestone.condition ? "Atteint" : "À atteindre"}</strong></li>`
+    )).join("");
+
+    panel.innerHTML = `
+      <div class="rho-profile-intro">
+        <img src="assets/rho-guide.png" alt="Rho, rhinocéros éclaireur de Quête du vivant"/>
+        <div><p class="profile-eyebrow">Message de Rho</p><blockquote>${message.text}</blockquote></div>
+      </div>
+      <div class="rho-profile-stats">
+        <article class="profile-stat profile-stat-xp"><span>Expérience</span><strong>${save.xp} XP</strong><small>Niveau ${level}</small><progress max="100" value="${levelProgress}" aria-label="${levelProgress} XP sur 100 vers le prochain niveau"></progress></article>
+        <article class="profile-stat"><span>Défis accomplis</span><strong>${completedAvailable} / ${available.length}</strong><small>Parmi les défis accessibles</small><progress max="${Math.max(available.length, 1)}" value="${completedAvailable}" aria-label="${completedAvailable} défis accomplis sur ${available.length} accessibles"></progress></article>
+        <article class="profile-stat"><span>Mondes explorés</span><strong>${exploredWorlds} / 5</strong><small>Les mondes 01 et 02 forment l’expédition actuelle</small></article>
+      </div>
+      <section class="profile-block" aria-labelledby="journey-heading">
+        <div class="profile-section-heading"><p class="profile-eyebrow">Carte de voyage</p><h3 id="journey-heading">Les mondes de l’expédition</h3></div>
+        <div class="journey-route">${worldMarkup}</div>
+        <div class="journey-legend" aria-label="États des mondes"><span>Ouvert</span><span>Exploré</span><span>Mission accomplie</span><span>Verrouillé</span></div>
+      </section>
+      <section class="profile-block" aria-labelledby="activities-heading">
+        <div class="profile-section-heading"><p class="profile-eyebrow">Journal des missions</p><h3 id="activities-heading">Défis accomplis et à relever</h3></div>
+        <div class="progress-activity-grid">${activityMarkup}</div>
+      </section>
+      <div class="profile-lower-grid">
+        <section class="profile-block" aria-labelledby="badges-heading">
+          <div class="profile-section-heading"><p class="profile-eyebrow">Objets de collection</p><h3 id="badges-heading">Insignes de Rho</h3></div>
+          <div class="rho-badge-grid">${badgeMarkup}</div>
+        </section>
+        <section class="profile-block" aria-labelledby="milestones-heading">
+          <div class="profile-section-heading"><p class="profile-eyebrow">Repères du sentier</p><h3 id="milestones-heading">Étapes marquantes</h3></div>
+          <ol class="rho-milestones">${milestoneMarkup}</ol>
+        </section>
+      </div>
+      <p class="progress-save-note" role="status">${storageAvailable ? "La progression est enregistrée dans ce navigateur." : "La sauvegarde locale est indisponible dans ce navigateur."}</p>`;
+
+    setGuide(message.text, message.mood, false);
   }
 
   function addWorldMap() {
@@ -573,13 +818,28 @@
   }
 
   setupResponsiveNavigation();
+  recordWorldVisit();
   updateHud();
   createScene();
   createMission();
   createGuide();
   decorateGuideNotes();
+  clarifyButtonLabels();
   addWorldMap();
   addSceneControls();
   setupScientistActivities();
   observeActivities();
+  renderProgressPage();
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== SAVE_KEY || !event.newValue) return;
+    try {
+      save = normalizeSave(JSON.parse(event.newValue));
+      updateHud();
+      refreshPortals();
+      renderProgressPage();
+    } catch (error) {
+      console.error("La progression partagée de Quête du vivant est invalide.", error);
+    }
+  });
 })();

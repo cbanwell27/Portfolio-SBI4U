@@ -413,6 +413,7 @@ body.adventure-site .breadcrumbs a {
 .mission-board {
   position: relative;
   overflow: hidden;
+  scroll-margin-top: 9rem;
   margin: 1.4rem 0 2rem;
   padding: clamp(1.2rem, 3vw, 2rem);
   border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
@@ -1421,5 +1422,588 @@ body.adventure-site .scientist-station {
 
   .scientist-portrait {
     width: min(100%, 18rem);
+  }
+}
+
+body.adventure-site.world-profile {
+  --world-glow: #bba8ff;
+  --accent: #bba8ff;
+  --accent2: #73e5cb;
+}
+
+body.world-profile .quest-scene {
+  min-height: 19rem;
+  --world-art:
+    radial-gradient(circle at 78% 24%, rgba(187, 168, 255, 0.48), transparent 16rem),
+    linear-gradient(145deg, #17284b, #3c3664 55%, #214d5b);
+}
+
+body.adventure-site button:not(.rho-toggle):not(.nav-menu-toggle),
+body.adventure-site .btn {
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.8rem;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.85rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+body.adventure-site button:not(:disabled):hover,
+body.adventure-site .btn:not([aria-disabled="true"]):hover {
+  filter: brightness(1.12);
+}
+
+body.adventure-site button:not(:disabled):active,
+body.adventure-site .btn:not([aria-disabled="true"]):active {
+  filter: brightness(0.96);
+  transform: translateY(1px);
+}
+
+body.adventure-site button:disabled,
+body.adventure-site .btn[aria-disabled="true"] {
+  border-color: #66738c;
+  background: #29344d;
+  color: #e2e8f2;
+  cursor: not-allowed;
+  filter: none;
+  opacity: 1;
+  transform: none;
+}
+
+body.adventure-site .concept-node {
+  min-height: 3rem;
+  padding: 0.65rem 0.8rem;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+body.adventure-site .concept-node[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #102037;
+}
+
+body.adventure-site .match-option {
+  display: flex;
+  width: 100%;
+  min-height: 3.2rem;
+  justify-content: flex-start;
+  padding: 0.7rem 0.85rem;
+  border-color: rgba(218, 231, 244, 0.36);
+  background: #202b43;
+  color: #f5f4ed;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+body.adventure-site .match-option:not(:disabled):hover,
+body.adventure-site .match-option[aria-pressed="true"]:not([data-matched="true"]) {
+  border-color: var(--accent);
+  background: #31425e;
+  color: #fff;
+}
+
+body.adventure-site .match-option[data-matched="true"] {
+  border-color: #79d3a8;
+  background: #193b35;
+  color: #eafff5;
+}
+
+body.adventure-site .rho-toggle {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 3.3rem;
+  gap: 0.5rem;
+  padding: 0.25rem 0.9rem 0.25rem 0.3rem;
+  border-radius: 999px;
+  color: #09243a;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+body.adventure-site .rho-toggle img {
+  width: 2.7rem;
+  height: 2.7rem;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+body.adventure-site .top > .rho-companion .rho-toggle {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 3rem;
+}
+
+body.adventure-site .top > .rho-companion .rho-toggle img {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+}
+
+.rho-profile-intro {
+  display: grid;
+  grid-template-columns: minmax(7rem, 10rem) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-bottom: 1rem;
+  padding: clamp(1rem, 3vw, 1.6rem);
+  border: 1px solid rgba(187, 168, 255, 0.35);
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(circle at 0 50%, rgba(187, 168, 255, 0.14), transparent 18rem),
+    rgba(20, 29, 51, 0.92);
+}
+
+.rho-profile-intro img {
+  display: block;
+  width: 100%;
+  max-height: 10rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.8rem 1rem rgba(0, 0, 0, 0.3));
+}
+
+.profile-eyebrow {
+  margin: 0 0 0.35rem;
+  color: #73e5cb !important;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rho-profile-intro blockquote {
+  margin: 0;
+  color: #fff4d8;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  line-height: 1.5;
+}
+
+.rho-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.4rem;
+}
+
+.profile-stat {
+  display: grid;
+  align-content: start;
+  gap: 0.28rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, #202b45, #172238);
+}
+
+.profile-stat > span {
+  color: #cbd4e4;
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.profile-stat > strong {
+  color: #fff4d8;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.2;
+}
+
+.profile-stat > small {
+  color: #c5ccda;
+  line-height: 1.45;
+}
+
+.profile-stat progress {
+  width: 100%;
+  height: 0.65rem;
+  margin-top: 0.35rem;
+  accent-color: var(--accent);
+}
+
+.profile-block {
+  margin: 1.3rem 0;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background:
+    radial-gradient(ellipse at 100% 0, rgba(187, 168, 255, 0.09), transparent 24rem),
+    rgba(18, 27, 48, 0.92);
+}
+
+.profile-section-heading {
+  margin-bottom: 1rem;
+}
+
+.profile-section-heading h3 {
+  margin: 0;
+  color: #fff4d8;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.3rem, 2.3vw, 1.8rem);
+}
+
+.journey-route {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.journey-world {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 11rem;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(218, 231, 244, 0.25);
+  border-radius: 1rem;
+  background: linear-gradient(150deg, rgba(85, 223, 194, 0.12), rgba(255, 255, 255, 0.035));
+  color: #f5f4ed;
+  text-decoration: none;
+}
+
+a.journey-world:hover {
+  border-color: var(--accent);
+  background: linear-gradient(150deg, rgba(187, 168, 255, 0.2), rgba(255, 255, 255, 0.055));
+}
+
+.journey-world[data-state="complete"] {
+  border-color: #79d3a8;
+  background: linear-gradient(150deg, rgba(61, 143, 111, 0.26), rgba(255, 255, 255, 0.035));
+}
+
+.journey-world[data-state="locked"] {
+  border-style: dashed;
+  background: rgba(10, 16, 29, 0.72);
+  color: #c5ccda;
+}
+
+.journey-world-number,
+.activity-category {
+  color: #73e5cb;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.journey-world strong {
+  color: #fff4d8;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.journey-world-status,
+.activity-status,
+.badge-status {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0.24rem 0.55rem;
+  border: 1px solid rgba(218, 231, 244, 0.32);
+  border-radius: 999px;
+  color: #e2e8f2;
+  font-size: 0.75rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.journey-world-status[data-status="complete"],
+.activity-status[data-status="completed"] {
+  border-color: #79d3a8;
+  background: rgba(47, 121, 91, 0.25);
+  color: #d7ffe9;
+}
+
+.journey-world-status[data-status="explored"],
+.activity-status[data-status="in-progress"] {
+  border-color: #73e5cb;
+  background: rgba(39, 114, 105, 0.24);
+  color: #dcfff7;
+}
+
+.journey-world-status[data-status="locked"],
+.activity-status[data-status="locked"] {
+  border-color: #68748a;
+  background: rgba(104, 116, 138, 0.16);
+  color: #d5dce7;
+}
+
+.journey-world small,
+.journey-world-link {
+  margin-top: auto;
+  color: #d6deed;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.journey-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.journey-legend span {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: #d6deed;
+  font-size: 0.76rem;
+}
+
+.progress-activity-grid,
+.rho-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.progress-activity {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.progress-activity[data-status="completed"] {
+  border-color: rgba(121, 211, 168, 0.6);
+}
+
+.progress-activity[data-status="locked"] {
+  background: rgba(8, 14, 26, 0.5);
+}
+
+.activity-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.progress-activity h4,
+.rho-badge h4 {
+  margin: 0;
+  color: #fff4d8;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.progress-activity p,
+.rho-badge p {
+  margin: 0;
+  color: #cbd4e4;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.activity-action {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 2.6rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(115, 229, 203, 0.45);
+  border-radius: 999px;
+  color: #9af4df;
+  font-weight: 750;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.activity-action:hover {
+  background: rgba(115, 229, 203, 0.12);
+}
+
+.activity-locked {
+  color: #c5ccda;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.rho-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.rho-badge[data-earned="true"] {
+  border-color: rgba(255, 201, 110, 0.65);
+  background: linear-gradient(135deg, rgba(255, 201, 110, 0.14), rgba(255, 255, 255, 0.035));
+}
+
+.rho-badge[data-earned="false"] {
+  opacity: 0.78;
+}
+
+.rho-badge-icon {
+  display: inline-grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 201, 110, 0.45);
+  border-radius: 50%;
+  background: rgba(255, 201, 110, 0.12);
+  color: #ffd98a;
+  font-size: 1.2rem;
+}
+
+.badge-status {
+  margin-top: 0.45rem;
+}
+
+.rho-badge[data-earned="true"] .badge-status {
+  border-color: #f0c46c;
+  color: #ffe4a8;
+}
+
+.profile-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 0.8rem;
+}
+
+.rho-milestones {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rho-milestones li {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.45rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--line);
+  color: #e2e8f2;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.rho-milestones li[data-reached="true"] > span:first-child,
+.rho-milestones li[data-reached="true"] strong {
+  color: #9af4c5;
+}
+
+.rho-milestones strong {
+  color: #c5ccda;
+  font-size: 0.78rem;
+}
+
+.progress-save-note {
+  margin: 1rem 0 0;
+  color: #c5ccda !important;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  body.adventure-site .top > .rho-companion .rho-toggle {
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 2.8rem;
+    padding-right: 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  body.adventure-site .top > .rho-companion .rho-toggle img {
+    width: 2.3rem;
+    height: 2.3rem;
+  }
+
+  .rho-profile-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-stat-xp {
+    grid-column: 1 / -1;
+  }
+
+  .journey-route {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  }
+
+  .profile-lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .progress-activity-grid,
+  .rho-badge-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  body.adventure-site button:not(.rho-toggle):not(.nav-menu-toggle),
+  body.adventure-site .btn {
+    padding: 0.6rem 0.72rem;
+    font-size: 0.9rem;
+  }
+
+  body.adventure-site .rho-toggle {
+    min-height: 2.8rem;
+    gap: 0.35rem;
+    padding-right: 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  body.adventure-site .rho-toggle img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .rho-profile-intro {
+    grid-template-columns: minmax(4.5rem, 6rem) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .rho-profile-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-stat-xp {
+    grid-column: auto;
+  }
+
+  .rho-milestones li {
+    grid-template-columns: 1.2rem minmax(0, 1fr);
+  }
+
+  .rho-milestones strong {
+    grid-column: 2;
   }
 }

@@ -18,19 +18,20 @@ PUBLIER SUR GITHUB PAGES
 - Dans Settings > Pages, choisissez Deploy from a branch, puis main et /(root).
 
 CONTENU
-- index.html : page d'accueil
-- presentation.html : présentation
-- lettre-ouverture.html : lettre d'ouverture
+- index.html : camp de départ et carte des mondes
+- presentation.html : briefing d’expédition
+- lettre-ouverture.html : lettre de bord
+- parcours-rho.html : profil, progression, missions et insignes de Rho
 - unite1.html et unite2.html : unités 1 et 2
 - unite1.html : leçons du Module 1 (sections 1.1 à 2.2) et simulation enzymatique
 - unite2.html : leçons du Module 2 (sections 3.1 à 4.2), respiration et photosynthèse
-- articles.html : articles scientifiques sur Maud L. Menten et Norman P. A. Hüner, schémas interactifs et défis
-- carrieres.html : carrières
-- bibliographie.html : bibliographie
+- articles.html : archives scientifiques sur Maud L. Menten et Norman P. A. Hüner, schémas interactifs et défis
+- carrieres.html : voies d’avenir en biologie
+- bibliographie.html : bibliothèque de terrain
 - site.css : composants et interactions partagés du portfolio
 - unite1.js : simulation pédagogique des facteurs qui influencent l’activité enzymatique
 - adventure.css : mondes illustrés, interface de jeu et styles du compagnon
-- adventure.js : compagnon Rho, missions, XP, insignes, déverrouillage et sauvegarde locale
+- adventure.js : compagnon Rho, missions, XP, insignes, mondes visités et sauvegarde locale
 - assets/rho-guide.png : illustration du rhinocéros fournie par Charlotte
 - assets/maud-menten.jpg : portrait de la Smithsonian Institution Archives, via Wikimedia Commons
 - assets/norman-huner.png : portrait fourni par Charlotte
