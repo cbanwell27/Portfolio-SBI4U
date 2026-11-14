@@ -627,6 +627,39 @@ body.adventure-site .breadcrumbs a {
   outline-offset: 3px;
 }
 
+body.adventure-site .question label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0.4rem 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(218, 231, 244, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+body.adventure-site .question label:hover {
+  border-color: rgba(85, 223, 194, 0.55);
+  background: rgba(85, 223, 194, 0.08);
+}
+
+body.adventure-site .question label:has(input[type="radio"]:checked) {
+  border-color: var(--accent);
+  background: rgba(85, 223, 194, 0.16);
+  color: #fff;
+}
+
+body.adventure-site .question input[type="radio"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  margin: 0.22rem 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 .adventure-site footer {
   border-color: var(--line);
   background: rgba(7, 13, 28, 0.75);
